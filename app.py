@@ -362,78 +362,6 @@ def read_config(filename):
         print(f"Erreur lors de la lecture: {str(e)}")
         return None
 
-def monitor_network_changes_inotify():
-    """
-    Surveille les modifications des interfaces réseau en utilisant inotify
-    """
-    if not INOTIFY_AVAILABLE:
-        print("Module inotify non disponible. Utilisation de la méthode de polling.")
-        monitor_network_changes_polling()
-        return
-    
-    inotify = INotify()
-    # Surveiller /sys/class/net pour les modifications d'interfaces
-    watch_flags = flags.MODIFY | flags.CREATE | flags.DELETE
-    
-    try:
-        # Ajouter des watchs pour chaque interface
-        watches = {}
-        interfaces = netifaces.interfaces()
-        
-        for interface in interfaces:
-            path = f"/sys/class/net/{interface}"
-            if os.path.exists(path):
-                try:
-                    wd = inotify.add_watch(path, watch_flags)
-                    watches[wd] = interface
-                except OSError as e:
-                    print(f"Impossible de surveiller l'interface {interface}: {e}")
-        
-        # Ajouter un watch pour le répertoire principal
-        net_dir = "/sys/class/net"
-        if os.path.exists(net_dir):
-            try:
-                wd = inotify.add_watch(net_dir, watch_flags)
-                watches[wd] = "network_directory"
-            except OSError as e:
-                print(f"Impossible de surveiller le répertoire réseau: {e}")
-        
-        print("Surveillance des modifications réseau (méthode inotify)...")
-        print("Appuyez sur Ctrl+C pour arrêter.")
-        
-        # Gérer l'interruption Ctrl+C
-        def signal_handler(sig, frame):
-            print("\nSurveillance arrêtée.")
-            inotify.close()
-            sys.exit(0)
-        
-        signal.signal(signal.SIGINT, signal_handler)
-        
-        # Boucle principale de surveillance
-        while True:
-            events = inotify.read(timeout=1000)
-            for event in events:
-                interface = watches.get(event.wd, "unknown")
-                timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                print(f"[{timestamp}] Modification détectée sur {interface}")
-                
-                # Mise à jour des informations réseau
-                current_config = get_network_config()
-                if interface in current_config:
-                    print(f"Configuration actuelle de {interface}:")
-                    if 'ipv4' in current_config[interface]:
-                        for addr in current_config[interface]['ipv4']:
-                            print(f"  IPv4: {addr['addr']}")
-            
-            # Pause courte pour éviter de surcharger le processeur
-            time.sleep(0.1)
-    
-    except Exception as e:
-        print(f"Erreur lors de la surveillance avec inotify: {str(e)}")
-        print("Basculement vers la méthode de polling...")
-        monitor_network_changes_polling()
-    finally:
-        inotify.close()
 
 def monitor_network_changes_polling():
     """
@@ -478,10 +406,9 @@ def monitor_network_changes():
     """
     Point d'entrée pour la surveillance réseau qui choisit la méthode appropriée
     """
-    if INOTIFY_AVAILABLE and NETIFACES_AVAILABLE:
-        monitor_network_changes_inotify()
-    else:
-        monitor_network_changes_polling()
+    monitor_network_changes_polling()
+
+        
 
 def validate_input(input_value, min_val, max_val):
     """
