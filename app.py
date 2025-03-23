@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Fluxia - Outil de gestion des configurations réseau
-Développé par Robin et 2 raslard
+Développé par leZen, Agridien, ReNaGe
 Version 0.0.1
 """
 
@@ -624,4 +624,3 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"Erreur fatale: {str(e)}")
         sys.exit(1)
-        
