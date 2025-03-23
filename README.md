@@ -26,9 +26,9 @@ La portabilité de l'outil permet une facilité de transfert entre différentes 
 |----------------------------------|-------------|
 | 🔍 Afficher les interfaces       | Liste toutes les interfaces réseau et leurs propriétés (IP, MAC, etc.) |
 | 📁 Export JSON                   | Exporte les interfaces et leurs paramètres dans un fichier JSON |
+| 📁 Charger depuis un JSON        | Charge et affiche la configuration des interfaces depuis un fichier JSON |
 | 📡 Surveiller les modifications  | Active un mode de surveillance continue des changements d'IP, de statut, etc. |
 | 🔐 Voir les ports ouverts        | Affiche les ports TCP/UDP ouverts, ainsi que les processus associés |
-| ❌ Quitter                       | Ferme l’outil proprement |
 
 ## 📖 Documentation
 
