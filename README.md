@@ -46,6 +46,17 @@ Installation des dépendances
 python ./install.py
 ```
 
+### ⚙️ Utilisation
 
+#### Pour lancer l'interface via le menu.
+```
+python ./app.py
+```
+
+#### Pour utiliser le tool via les arguments
+
+```
+python ./app.py [-h] [-r FICHIER] [-w FICHIER] [-m] [-v]
+```
 
 
