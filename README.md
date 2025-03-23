@@ -53,7 +53,7 @@ python ./install.py
 python ./app.py
 ```
 
-#### Pour utiliser le tool via les arguments
+#### Pour utiliser le tool via les arguments.
 
 ```
 python ./app.py [-h] [-r FICHIER] [-w FICHIER] [-m] [-v]
