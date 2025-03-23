@@ -30,8 +30,22 @@ La portabilité de l'outil permet une facilité de transfert entre différentes 
 | 🔐 Voir les ports ouverts        | Affiche les ports TCP/UDP ouverts, ainsi que les processus associés |
 | ❌ Quitter                       | Ferme l’outil proprement |
 
-## 📦 Dépendances
+## 📖 Documentation
 
-- Python 3.6+
-- [psutil](https://pypi.org/project/psutil/) (pour la récupération des données réseau)
+Vous retrouverez ci-dessous les informations utiles concernant l'utilisation de l'outil.
+
+### 🔧 Installation
+
+```
+git clone https://github.com/leZenfr/fluxia.git
+cd fluxia
+```
+
+Installation des dépendances 
+```
+python ./install.py
+```
+
+
+
 
