@@ -41,6 +41,10 @@ Vous retrouverez ci-dessous les informations utiles concernant l'utilisation de 
 
 ```
 git clone https://github.com/leZenfr/fluxia.git
+
+python3 -m venv <nom>
+source <nom>/bin/activate
+
 cd fluxia
 ```
 
@@ -70,20 +74,17 @@ Préparation de la machine
 ```
 apt install python3-pip
 apt install python3.11-venv
-
 ```
 
-Clone du répertoire
 ```
 git clone https://github.com/leZenfr/fluxia.git
+
+python3 -m venv <nom>
+source <nom>/bin/activate
+
 cd fluxia
 ```
 
-Création de l'environnement virtuel
-```
-python3 -m venv <nom>
-source <nom>/bin/activate
-```
 
 Installation des dépendances 
 ```
