@@ -73,6 +73,7 @@ apt install python3.11-venv
 
 ```
 
+Clone du répertoire
 ```
 git clone https://github.com/leZenfr/fluxia.git
 cd fluxia
