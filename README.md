@@ -34,7 +34,10 @@ La portabilité de l'outil permet une facilité de transfert entre différentes 
 
 Vous retrouverez ci-dessous les informations utiles concernant l'utilisation de l'outil.
 
+
 ### 🔧 Installation
+
+<details><summary>Kali Linux</summary>
 
 ```
 git clone https://github.com/leZenfr/fluxia.git
@@ -58,5 +61,49 @@ python ./app.py
 ```
 python ./app.py [-h] [-r FICHIER] [-w FICHIER] [-m] [-v]
 ```
+
+</details>
+
+<details><summary>Debian 12</summary>
+
+Préparation de la machine
+```
+apt install python3-pip
+apt install python3.11-venv
+
+```
+
+```
+git clone https://github.com/leZenfr/fluxia.git
+cd fluxia
+```
+
+Création de l'environnement virtuel
+```
+python3 -m venv <nom>
+source <nom>/bin/activate
+```
+
+Installation des dépendances 
+```
+python ./install.py
+```
+
+### ⚙️ Utilisation
+
+#### Pour lancer l'interface via le menu.
+```
+python ./app.py
+```
+
+#### Pour utiliser le tool via les arguments.
+
+```
+python ./app.py [-h] [-r FICHIER] [-w FICHIER] [-m] [-v]
+```
+
+</details>
+
+
 
 
