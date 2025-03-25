@@ -72,6 +72,7 @@ python ./app.py [-h] [-r FICHIER] [-w FICHIER] [-m] [-v]
 
 Préparation de la machine
 ```
+apt install git-all
 apt install python3-pip
 apt install python3.11-venv
 ```
