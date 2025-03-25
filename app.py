@@ -92,10 +92,6 @@ def get_server_ports_and_clients():
         with os.popen('ss -tuln') as f:
             listener_lines = f.readlines()
         
-        # Utiliser 'ss' pour obtenir les connexions établies
-        with os.popen('ss -tn state established') as f:
-            established_lines = f.readlines()
-        
         # Traiter les sockets qui écoutent
         for line in listener_lines[1:]:  # Ignorer l'en-tête
             parts = line.split()
@@ -116,23 +112,65 @@ def get_server_ports_and_clients():
                         "protocol": protocol
                     }
         
-        # Traiter les connexions établies
-        for line in established_lines[1:]:  # Ignorer l'en-tête
-            parts = line.split()
-            if len(parts) < 5:
-                continue
+        # Utiliser 'netstat' ou 'ss' pour obtenir les connexions établies
+        # Essayer d'abord avec netstat pour une meilleure compatibilité
+        try:
+            with os.popen('netstat -tna | grep ESTABLISHED') as f:
+                established_lines = f.readlines()
                 
-            local_address = parts[3]
-            remote_address = parts[4]
-            
-            if ":" in local_address and ":" in remote_address:
-                local_ip, local_port = local_address.rsplit(":", 1)
-                remote_ip, remote_port = remote_address.rsplit(":", 1)
+            # Traiter les connexions établies avec netstat
+            for line in established_lines:
+                parts = line.split()
+                if len(parts) < 6:
+                    continue
+                    
+                local_address = parts[3] 
+                remote_address = parts[4]
                 
-                # Si le port local est un port serveur (qui écoute)
-                if local_port in server_ports:
-                    if remote_ip not in server_ports[local_port]["clients"]:
-                        server_ports[local_port]["clients"].append(remote_ip)
+                if ":" in local_address and ":" in remote_address:
+                    local_parts = local_address.rsplit(":", 1)
+                    remote_parts = remote_address.rsplit(":", 1)
+                    
+                    if len(local_parts) == 2 and len(remote_parts) == 2:
+                        local_ip, local_port = local_parts
+                        remote_ip, remote_port = remote_parts
+                        
+                        if local_port in server_ports and remote_ip not in server_ports[local_port]["clients"]:
+                            server_ports[local_port]["clients"].append(remote_ip)
+                
+        except Exception as netstat_error:
+            print(f"Tentative avec ss après échec de netstat: {netstat_error}")
+            # Fallback sur ss si netstat échoue
+            with os.popen('ss -tna | grep ESTAB') as f:
+                established_lines = f.readlines()
+                
+            # Traiter les connexions établies avec ss
+            for line in established_lines:
+                parts = line.split()
+                if len(parts) < 5:
+                    continue
+                    
+                local_address = parts[3]
+                remote_address = parts[4]
+                
+                if ":" in local_address and ":" in remote_address:
+                    local_ip, local_port = local_address.rsplit(":", 1)
+                    remote_ip, remote_port = remote_address.rsplit(":", 1)
+                    
+                    # Si le port local est un port serveur (qui écoute)
+                    if local_port in server_ports:
+                        if remote_ip not in server_ports[local_port]["clients"]:
+                            server_ports[local_port]["clients"].append(remote_ip)
+        
+        # Tentative spécifique pour SSH (port 22)
+        if "22" in server_ports and not server_ports["22"]["clients"]:
+            with os.popen("who | awk '{print $5}' | tr -d '()' | grep -v '^$'") as f:
+                ssh_clients = f.readlines()
+                
+            for client in ssh_clients:
+                client = client.strip()
+                if client and client not in server_ports["22"]["clients"]:
+                    server_ports["22"]["clients"].append(client)
         
         return server_ports
     except Exception as e:
