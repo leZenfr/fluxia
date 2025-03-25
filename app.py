@@ -84,29 +84,56 @@ CONFIG_ART = """
 def get_server_ports_and_clients():
     """
     Obtient les ports serveurs bindés et les clients connectés à ces ports
+    Compatible avec Kali Linux dans un environnement virtuel
     """
     server_ports = {}
     try:
-        # Obtenir les connexions ouvertes
+        # Utiliser 'ss' pour obtenir les serveurs qui écoutent
         with os.popen('ss -tuln') as f:
-            lines = f.readlines()
-            for line in lines[1:]:
-                parts = line.split()
-                protocol = parts[0]
-                local_address = parts[3]
-                remote_address = parts[4]
-                pid_program = parts[6] if len(parts) > 6 else "N/A"
+            listener_lines = f.readlines()
+        
+        # Utiliser 'ss' pour obtenir les connexions établies
+        with os.popen('ss -tn state established') as f:
+            established_lines = f.readlines()
+        
+        # Traiter les sockets qui écoutent
+        for line in listener_lines[1:]:  # Ignorer l'en-tête
+            parts = line.split()
+            if len(parts) < 5:
+                continue
+                
+            protocol = parts[0]
+            local_address = parts[4]
+            
+            if ":" in local_address:
                 local_ip, local_port = local_address.rsplit(":", 1)
-
-                # Ajouter les informations du port serveur et les clients
+                
+                # Ajouter le port serveur au dictionnaire
                 if local_port not in server_ports:
-                    server_ports[local_port] = {"clients": [], "pid_program": pid_program}
-
-                # Ajouter l'adresse distante (client) si elle est renseignée
-                if remote_address != "0.0.0.0:*":
-                    remote_ip, remote_port = remote_address.rsplit(":", 1)
-                    server_ports[local_port]["clients"].append(remote_ip)
-
+                    server_ports[local_port] = {
+                        "clients": [],
+                        "pid_program": "N/A",
+                        "protocol": protocol
+                    }
+        
+        # Traiter les connexions établies
+        for line in established_lines[1:]:  # Ignorer l'en-tête
+            parts = line.split()
+            if len(parts) < 5:
+                continue
+                
+            local_address = parts[3]
+            remote_address = parts[4]
+            
+            if ":" in local_address and ":" in remote_address:
+                local_ip, local_port = local_address.rsplit(":", 1)
+                remote_ip, remote_port = remote_address.rsplit(":", 1)
+                
+                # Si le port local est un port serveur (qui écoute)
+                if local_port in server_ports:
+                    if remote_ip not in server_ports[local_port]["clients"]:
+                        server_ports[local_port]["clients"].append(remote_ip)
+        
         return server_ports
     except Exception as e:
         print(f"Erreur lors de la récupération des ports serveurs et des clients: {e}")
