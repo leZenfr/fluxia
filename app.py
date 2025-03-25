@@ -454,8 +454,9 @@ def interactive_menu():
     """
     Affiche le menu interactif et gère les choix de l'utilisateur
     """
-    print(LOGO)
-    menu = """
+    while True:
+        print(LOGO)
+        menu = """
 [1]・Afficher les configurations réseau
 [2]・Exporter en json
 [3]・Charger depuis un fichier json
@@ -463,48 +464,56 @@ def interactive_menu():
 [5]・Afficher les ports serveurs bindés et les clients connectés
 [6]・Afficher les ports clients avec adresses et hôtes
 [0]・Quitter
-    """
-    print(menu)
-    
-    try:
-        user_choice = input("Veuillez choisir l'option que vous voulez (0-6) : ")
-        choice = validate_input(user_choice, 0, 6)
-        
-        if choice is None:
-            print("Choix invalide. Veuillez entrer un nombre entre 0 et 6.")
-            return
-        
-        if choice == 0:
-            print("Au revoir!")
-            sys.exit(0)
-        elif choice == 1:
-            show_config()
-        elif choice == 2:
-            filename = input("Nom du fichier d'exportation (par défaut: config.json): ").strip() or "config.json"
-            # Validation simple du nom de fichier
-            if "/" in filename and not os.path.isabs(filename):
-                print("Erreur: Veuillez utiliser un chemin absolu ou un nom de fichier sans '/'")
-                return
-            export_config(filename)
-        elif choice == 3:
-            filename = input("Nom du fichier à charger: ").strip()
-            if not filename:
-                print("Erreur: Nom de fichier requis")
-                return
-            config = read_config(filename)
-            if config:
-                show_config(config)
-        elif choice == 4:
-            monitor_network_changes()
-        elif choice == 5:
-            show_server_ports_and_clients()
-        elif choice == 6:
-            show_client_ports_and_hostnames()
-    
-    except KeyboardInterrupt:
-        print("\nOpération annulée par l'utilisateur.")
-    except Exception as e:
-        print(f"Erreur inattendue: {str(e)}")
+"""
+        print(menu)
+
+        try:
+            user_choice = input("Veuillez choisir l'option que vous voulez (0-6) : ")
+            choice = validate_input(user_choice, 0, 6)
+
+            if choice is None:
+                print("Choix invalide. Veuillez entrer un nombre entre 0 et 6.")
+                input("Appuyez sur Entrée pour continuer...")
+                continue
+
+            if choice == 0:
+                print("Au revoir!")
+                sys.exit(0)
+            elif choice == 1:
+                show_config()
+            elif choice == 2:
+                filename = input("Nom du fichier d'exportation (par défaut: config.json): ").strip() or "config.json"
+                # Validation simple du nom de fichier
+                if "/" in filename and not os.path.isabs(filename):
+                    print("Erreur: Veuillez utiliser un chemin absolu ou un nom de fichier sans '/'")
+                else:
+                    export_config(filename)
+            elif choice == 3:
+                filename = input("Nom du fichier à charger: ").strip()
+                if not filename:
+                    print("Erreur: Nom de fichier requis")
+                else:
+                    config = read_config(filename)
+                    if config:
+                        show_config(config)
+            elif choice == 4:
+                try:
+                    monitor_network_changes()
+                except KeyboardInterrupt:
+                    print("\nSurveillance arrêtée.")
+            elif choice == 5:
+                show_server_ports_and_clients()
+            elif choice == 6:
+                show_client_ports_and_hostnames()
+                
+            input("\nAppuyez sur Entrée pour revenir au menu principal...")
+
+        except KeyboardInterrupt:
+            print("\nOpération annulée par l'utilisateur.")
+            input("Appuyez sur Entrée pour revenir au menu principal...")
+        except Exception as e:
+            print(f"Erreur inattendue: {str(e)}")
+            input("Appuyez sur Entrée pour revenir au menu principal...")
 
 def main():
     """
