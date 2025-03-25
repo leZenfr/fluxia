@@ -112,8 +112,7 @@ def get_server_ports_and_clients():
                         "protocol": protocol
                     }
         
-        # Utiliser 'netstat' ou 'ss' pour obtenir les connexions établies
-        # Essayer d'abord avec netstat pour une meilleure compatibilité
+        # test avec netstat
         try:
             with os.popen('netstat -tna | grep ESTABLISHED') as f:
                 established_lines = f.readlines()
